@@ -18,7 +18,7 @@ model Todo {
   title     String
   author    User?   @relation(fields: [authorId], references: [id])
   authorId  Int?
-  status Boolean @default(false)
+  isComplete Boolean @default(false)
 }
 
 model User {

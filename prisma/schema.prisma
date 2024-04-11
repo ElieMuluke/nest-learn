@@ -16,27 +16,19 @@ datasource db {
 model Todo {
   id        Int     @id @default(autoincrement())
   title     String
-  published Boolean @default(false)
   author    User?   @relation(fields: [authorId], references: [id])
   authorId  Int?
-  isCompleted Boolean @default(false)
-}
-
-model Session {
-  id              Int      @id @default(autoincrement())
-  accessToken     String
-  refreshToken    String
-  user            User     @relation(fields: [currentUserId], references: [id])
-  currentUserId   Int
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  status Boolean @default(false)
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  name     String?
-  email    String  @unique
-  password String
-  todos    Todo[]
-  sessions Session[]
+  id              Int     @id @default(autoincrement())
+  name            String?
+  email           String  @unique
+  hashedPassword  String
+  accessToken     String?
+  refreshToken    String?
+  todos           Todo[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

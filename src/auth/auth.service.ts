@@ -1,62 +1,81 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
-import { SessionsService } from 'src/sessions/sessions.service';
 import { JwtService } from '@nestjs/jwt';
+import { hash, compare } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-    private sessionsService: SessionsService,
   ) {}
 
-  async signUp(username: string, email: string, password: string) {
+  async signUp(name: string, email: string, password: string) {
     try {
+      const hashedPassword = await hash(password, 10);
       const user = await this.usersService.create({
-        name: username,
+        name,
         email,
-        password,
+        hashedPassword,
       });
 
       return user;
     } catch (err) {
       console.log(err);
+      return null;
     }
   }
 
-  async signIn(email: string, pass: string): Promise<any> {
+  async signIn(email: string, password: string): Promise<any> {
     try {
       const user = await this.usersService.findOneByEmail(email);
+      // remove entry hashedPassword from user object --> I know it can be done like this -> remove hashedPassword
 
-      if (user?.password !== pass) {
-        throw new UnauthorizedException();
+      if (!user) {
+        throw new NotFoundException('user does not exist');
       }
-      const payload = { sub: user.id, email: user.email };
 
-      const session = await this.sessionsService.create({
-        currentUserId: user.id,
+      if (!(await compare(password, user.hashedPassword))) {
+        throw new NotFoundException('username or password are incorrent');
+      }
+
+      const payload = {
+        userId: user.id,
+        email: user.email,
+        password: user.hashedPassword,
+      };
+
+      const updatedUser = await this.usersService.update(user.id, {
         accessToken: this.jwtService.sign(payload),
         refreshToken: this.jwtService.sign(payload),
       });
 
-      return {
-        ...user,
-        accessToken: session.accessToken,
-        refreshToken: session.refreshToken,
-      };
+      return updatedUser;
     } catch (err) {
       console.log(err);
+      return null;
     }
   }
 
   async getProfile(userId: string) {
     try {
-      const user = await this.usersService.findOne(Number.parseInt(userId));
+      const user = await this.usersService.findOne(Number(userId));
 
       return user;
     } catch (err) {
       console.log(err);
+      return null;
+    }
+  }
+
+  async getUsers() {
+    try {
+      const user = await this.usersService.findAll();
+
+      return user;
+    } catch (err) {
+      console.log(err);
+      return null;
     }
   }
 }

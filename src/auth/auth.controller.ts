@@ -1,10 +1,10 @@
 import {
   Body,
   Controller,
-  Get,
+  // Get,
   HttpCode,
   HttpStatus,
-  Param,
+  // Param,
   Post,
   // Request,
   // UseGuards,
@@ -19,33 +19,42 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('register')
-  signUp(@Body() signUpDto: Record<string, any>) {
+  async signUp(@Body() signUpDto: Record<string, any>) {
+    const newUser = await this.authService.signUp(
+      signUpDto.name,
+      signUpDto.email,
+      signUpDto.password,
+    );
+
+    if (!newUser) {
+      return {
+        message: 'User not registered successfully!',
+      };
+    }
+
     return {
       message: 'User registered successfully!',
-      user: this.authService.signUp(
-        signUpDto.username,
-        signUpDto.email,
-        signUpDto.password,
-      ),
     };
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(@Body() signInDto: Record<string, any>) {
+  async signIn(@Body() signInDto: Record<string, any>) {
+    const signin = await this.authService.signIn(
+      signInDto.username,
+      signInDto.password,
+    );
+
+    console.log({ signin });
+
+    if (!signin) {
+      return {
+        message: 'User not signed in successfully!',
+      };
+    }
     return {
-      message: 'User logged in successfully!',
-      user: this.authService.signIn(signInDto.username, signInDto.password),
+      message: 'User signed in successfully!',
+      user: signin,
     };
-  }
-
-  // @UseGuards(AuthGuard)
-  @HttpCode(HttpStatus.OK)
-  @Get('profile/:id')
-  getProfile(@Param() params: any): Record<string, any> {
-    const userId = params.id;
-    console.log(userId);
-
-    return this.authService.getProfile(userId);
   }
 }

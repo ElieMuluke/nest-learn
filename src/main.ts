@@ -1,3 +1,9 @@
+// TODO:
+//    -> routes naming,
+//    -> password hashing,
+//    -> pagination
+//    -> refactor users and sessions
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';

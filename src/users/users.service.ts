@@ -13,7 +13,11 @@ export class UsersService {
   }
 
   async findAll() {
-    return await this.prisma.user.findMany();
+    return await this.prisma.user.findMany({
+      include: {
+        todos: true,
+      },
+    });
   }
 
   async findOne(id: number) {
@@ -39,5 +43,9 @@ export class UsersService {
     return await this.prisma.user.delete({
       where: { id },
     });
+  }
+
+  async removeAll() {
+    return await this.prisma.user.deleteMany();
   }
 }

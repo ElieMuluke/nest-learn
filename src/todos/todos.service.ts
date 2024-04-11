@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class TodosService {
@@ -10,16 +9,13 @@ export class TodosService {
 
   async create(createTodoDto: CreateTodoDto) {
     return await this.prisma.todo.create({
-      data: createTodoDto as Prisma.TodoCreateInput, // Explicitly cast createTodoDto to the expected type
+      data: createTodoDto,
     });
   }
 
   async findAll() {
-    return await this.prisma.todo.findMany({
-      where: {
-        published: true,
-      },
-    });
+    // TODO: only show todos belonging to one user
+    return await this.prisma.todo.findMany({});
   }
 
   async findOne(id: number) {
@@ -39,5 +35,9 @@ export class TodosService {
     return await this.prisma.todo.delete({
       where: { id },
     });
+  }
+
+  async removeAll() {
+    return await this.prisma.todo.deleteMany();
   }
 }

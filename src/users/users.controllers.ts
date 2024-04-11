@@ -1,15 +1,5 @@
-import {
-  //   Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  //   Post,
-  // Request,
-  // UseGuards,
-} from '@nestjs/common';
+import { Controller, Delete, Get, Param } from '@nestjs/common';
 
-// import { AuthGuard } from './auth.guard';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -28,7 +18,6 @@ export class UserController {
     };
   }
 
-  // @UseGuards(AuthGuard)
   @Get(':id')
   async getProfile(@Param('id') id: string) {
     const user = await this.userService.findOne(Number(id));

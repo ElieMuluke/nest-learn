@@ -29,7 +29,6 @@ export class AuthService {
   async signIn(email: string, password: string): Promise<any> {
     try {
       const user = await this.usersService.findOneByEmail(email);
-      // remove entry hashedPassword from user object --> I know it can be done like this -> remove hashedPassword
 
       if (!user) {
         throw new NotFoundException('user does not exist');
@@ -57,22 +56,20 @@ export class AuthService {
     }
   }
 
-  async getProfile(userId: string) {
+  async logout(id: number) {
     try {
-      const user = await this.usersService.findOne(Number(userId));
+      const user = await this.usersService.findOne(id);
 
-      return user;
-    } catch (err) {
-      console.log(err);
-      return null;
-    }
-  }
+      if (!user) {
+        throw new NotFoundException('user does not exist');
+      }
 
-  async getUsers() {
-    try {
-      const user = await this.usersService.findAll();
+      const updatedUser = await this.usersService.update(user.id, {
+        accessToken: null,
+        refreshToken: null,
+      });
 
-      return user;
+      return updatedUser;
     } catch (err) {
       console.log(err);
       return null;

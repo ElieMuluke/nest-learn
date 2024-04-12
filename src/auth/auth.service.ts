@@ -41,7 +41,6 @@ export class AuthService {
       const payload = {
         userId: user.id,
         email: user.email,
-        password: user.hashedPassword,
       };
 
       const updatedUser = await this.usersService.update(user.id, {
